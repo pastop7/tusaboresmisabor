@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante - Bienvenidos</title>
+    <style>
+        body {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            text-align: center;
+            background-color: #fef2e4;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #c60000;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 23px;
+            background-color: #805a3b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #c60000;
+        }
+
+        .menu-item {
+            margin: 15px 0;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #c60000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #fd974f;
+        }
+    </style>
+</head>
+<body>
+    <!-- Página de bienvenida -->
+    <div id="welcome" class="container">
+        <div class="image-container">
+            <img src="imagenes/misabortusabor.png.png" alt="Bienvenido" class="welcome-image">
+        </div>
+        <button onclick="showMenu()">Menú</button>
+    </div>
+
+    <!-- Página del menú -->
+    <div id="menu" class="container" style="display:none;">
+        <h1>Nuestro Menú</h1>
+        <div class="menu-item">
+            <p>Bandera Dominicana</p>
+            <button onclick="selectDish('Bandera Dominicana')">Seleccionar</button>
+        </div>
+        <div class="menu-item">
+            <p>Sancocho</p>
+            <button onclick="selectDish('Sancocho')">Seleccionar</button>
+        </div>
+        <div class="menu-item">
+            <p>Mangú</p>
+            <button onclick="selectDish('Mangú')">Seleccionar</button>
+        </div>
+        <div class="menu-item">
+            <p>Mofongo</p>
+            <button onclick="selectDish('Mofongo')">Seleccionar</button>
+        </div>
+        <div class="menu-item">
+            <p>Lasagna</p>
+            <button onclick="selectDish('Lasagna')">Seleccionar</button>
+        </div>
+        <button class="back-button" onclick="goBack()">Volver</button>
+        <button onclick="viewOrder()">Ver Pedido</button>
+    </div>
+
+   <!-- Página de personalización del plato -->
+<div id="customize" class="container" style="display:none;">
+    <h1>Personalizar <span id="dish-name"></span></h1>
+    <p>Cantidad: 
+        <input type="number" id="quantity" min="1" value="1">
+    </p>
+    <p>Agregar/Quitar ingredientes:</p>
+    <label><input type="checkbox" id="ingredient1"> Aguacate</label><br>
+    <label><input type="checkbox" id="ingredient2"> Ensalada Verde</label><br>
+    
+    <!-- Botón para volver al menú -->
+    <button class="back-button" onclick="cancelDish()">Volver Atrás</button>
+    
+    <!-- Botón para añadir el plato al pedido -->
+    <button onclick="addToOrder()">Añadir al Pedido</button>
+</div>
+
+    <!-- Página del resumen del pedido -->
+    <div id="order-summary" class="container" style="display:none;">
+        <h1>Resumen de su Pedido</h1>
+        <div id="order-list"></div>
+        <button onclick="finalizeOrder()">Finalizar Pedido</button>
+        <button onclick="backToMenu()">Añadir Más Platos</button>
+    </div>
+
+    <!-- Página de confirmación de la orden -->
+    <div id="confirmation" class="container" style="display:none;">
+        <h1>Su orden está en camino</h1>
+        <p>Gracias por su pedido. Pronto lo recibirá.</p>
+        <button onclick="returnToMenu()">Volver al Menú</button>
+    </div>
+
+    <script>
+        let order = [];
+
+        function showMenu() {
+            document.getElementById("welcome").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+        }
+
+        function selectDish(dishName) {
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("customize").style.display = "block";
+            document.getElementById("dish-name").textContent = dishName;
+        }
+
+        function goBack() {
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("welcome").style.display = "block";
+        }
+
+        function addToOrder() {
+            const dishName = document.getElementById("dish-name").textContent;
+            const quantity = document.getElementById("quantity").value;
+            let ingredients = [];
+            if (document.getElementById("ingredient1").checked) ingredients.push("Ensalada Verde");
+            if (document.getElementById("ingredient2").checked) ingredients.push("Aguacate");
+
+            const dish = {
+                name: dishName,
+                quantity: quantity,
+                ingredients: ingredients
+            };
+
+            order.push(dish);
+            document.getElementById("customize").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+        }
+
+        function cancelDish() {
+            // Opción 1: Limpiar el campo de cantidad (opcional)
+           document.getElementById("quantity").value = 1;
+    
+            // Opción 2: Deseleccionar los ingredientes (opcional)
+          document.getElementById("ingredient1").checked = false;
+          document.getElementById("ingredient2").checked = false;
+    
+           // Ocultar la sección de personalización
+          document.getElementById("customize").style.display = "none";
+    
+           // Mostrar nuevamente el menú
+          document.getElementById("menu").style.display = "block";
+        }
+
+        function viewOrder() {
+            if (order.length === 0) {
+                alert("No ha seleccionado ningún plato.");
+                return;
+            }
+
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("order-summary").style.display = "block";
+
+            const orderList = document.getElementById("order-list");
+            orderList.innerHTML = "";
+
+            order.forEach((dish, index) => {
+                const dishDetails = `
+                    <p><strong>${dish.name}</strong> (Cantidad: ${dish.quantity})</p>
+                    <p>Ingredientes: ${dish.ingredients.length > 0 ? dish.ingredients.join(", ") : "Sin modificaciones"}</p>
+                    <hr>
+                `;
+                orderList.innerHTML += dishDetails;
+            });
+        }
+
+        function backToMenu() {
+            document.getElementById("order-summary").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+        }
+
+        function finalizeOrder() {
+            document.getElementById("order-summary").style.display = "none";
+            document.getElementById("confirmation").style.display = "block";
+        }
+
+        function returnToMenu() {
+            document.getElementById("confirmation").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+            order = [];
+        }
+    </script>
+</body>
+</html>
